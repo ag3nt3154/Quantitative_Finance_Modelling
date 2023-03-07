@@ -12,7 +12,7 @@ def get_price_data(ticker, save=True):
     df = df.rename(columns={'index': 'date'})
     if save:
         # Save to csv
-        df.to_csv(ticker + '.csv')
+        df.to_csv('stock_price_data/' + ticker + '.csv')
     return(df)
 
 
