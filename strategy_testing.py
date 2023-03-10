@@ -1,7 +1,32 @@
 import numpy as np
 import pandas as pd
 import tqdm
-from scipy.stats import gmean
+from scipy.stats import laplace, norm, gmean
+import matplotlib.pyplot as plt
+
+def fit_laplace(price_series):
+    '''
+    Find returns series from price series and
+    fit returns into a Laplace distribution.
+
+    Returns Laplace parameters
+    '''
+    print(price_series)
+    returns_series = (price_series[1:] - price_series[:-1]) / price_series[:-1]
+    return laplace.fit(returns_series)
+
+
+
+def generate_stock(laplace_params, num_days=252, initial_price=400):
+    '''
+    Generate array of stock prices according to laplace distribution
+    '''
+    loc, scale = laplace_params
+    
+    # generate returns from laplace distribution
+    s = np.random.laplace(loc, scale, num_days)
+    price_series = np.insert(np.cumprod(s + 1), 0, 1) * initial_price
+    return price_series
 
 def get_kpi(rt, ch, stock_daily_change):
     '''
