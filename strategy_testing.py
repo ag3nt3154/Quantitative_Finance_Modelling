@@ -9,7 +9,8 @@ def fit_laplace(price_series):
     Find returns series from price series and
     fit returns into a Laplace distribution.
 
-    Returns Laplace parameters
+    Input: numpy array
+    Output: laplace params
     '''
     print(price_series)
     returns_series = (price_series[1:] - price_series[:-1]) / price_series[:-1]
@@ -19,14 +20,47 @@ def fit_laplace(price_series):
 
 def generate_stock(laplace_params, num_days=252, initial_price=400):
     '''
-    Generate array of stock prices according to laplace distribution
+    Generate price series based on laplace distribution 
     '''
     loc, scale = laplace_params
     
     # generate returns from laplace distribution
     s = np.random.laplace(loc, scale, num_days)
+
     price_series = np.insert(np.cumprod(s + 1), 0, 1) * initial_price
     return price_series
+
+
+
+def buy_hold_strategy(ohlcv, initial_capital):
+    '''
+    Takes a dataframe of OHLCV data and returns a list of trades to be performed.
+
+    Trades in the format:
+    entry_date | entry_price | position | exit_date | exit_price | profit 
+    '''
+
+    trade_list = [(ohlcv['date'][0].date(), 
+                   ohlcv['adjclose'][0], 
+                   initial_capital // ohlcv['adjclose'][0],
+                   ohlcv['date'].iat[-1].date(),
+                   ohlcv['adjclose'].iat[-1],
+                   (ohlcv['adjclose'].iat[-1] - ohlcv['adjclose'][0]) * initial_capital // ohlcv['adjclose'][0])]
+    return trade_list
+
+
+
+def portfolio_changes(ohlcv, trade_list, initial_capital):
+    '''
+    Tracks portfolio stats over the course of the times series
+
+    Stats tracked:
+    1. Market value
+    2. Cash
+    3. Margin
+    '''
+    return df
+
 
 def get_kpi(rt, ch, stock_daily_change):
     '''
