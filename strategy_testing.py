@@ -32,7 +32,7 @@ def generate_stock(laplace_params, num_days=252, initial_price=400):
 
 
 
-def buy_hold_strategy(ohlcv, initial_capital):
+def buy_hold_strategy(ohlcv, initial_capital, leverage=1):
     '''
     Takes a dataframe of OHLCV data and returns a list of trades to be performed.
 
@@ -42,10 +42,10 @@ def buy_hold_strategy(ohlcv, initial_capital):
 
     trade_list = [(ohlcv['date'][0].date(), 
                    ohlcv['adjclose'][0], 
-                   initial_capital // ohlcv['adjclose'][0],
+                   initial_capital * leverage // ohlcv['adjclose'][0],
                    ohlcv['date'].iat[-1].date(),
                    ohlcv['adjclose'].iat[-1],
-                   (ohlcv['adjclose'].iat[-1] - ohlcv['adjclose'][0]) * initial_capital // ohlcv['adjclose'][0])]
+                   (ohlcv['adjclose'].iat[-1] - ohlcv['adjclose'][0]) * initial_capital * leverage // ohlcv['adjclose'][0])]
     return trade_list
 
 
@@ -59,6 +59,10 @@ def portfolio_changes(ohlcv, trade_list, initial_capital):
     2. Cash
     3. Margin
     '''
+    df = ohlcv['date'].copy()
+    for trade in trade_list:
+        pass
+
     return df
 
 

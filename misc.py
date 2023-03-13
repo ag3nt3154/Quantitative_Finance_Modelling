@@ -50,3 +50,16 @@ def date2str(datetime_obj):
     year = datetime_obj.year
     
     return str(day) + '/' + str(month) + '/' + str(year)
+
+
+def get_attr(args, key=None, default_value=None):
+    '''
+    If args is a dict: return args[key]
+    If args is an object: return args.key
+
+    If args[key] or args.key is not found, return default value
+    '''
+    if isinstance(args, dict):
+        return args[key] if key in args else default_value
+    elif isinstance(args, object):
+        return getattr(args, key, default_value) if key is not None else default_value
