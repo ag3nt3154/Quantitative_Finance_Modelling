@@ -60,6 +60,7 @@ def get_attr(args, key=None, default_value=None):
     If args[key] or args.key is not found, return default value
     '''
     if isinstance(args, dict):
+        print(args)
         return args[key] if key in args else default_value
     elif isinstance(args, object):
         return getattr(args, key, default_value) if key is not None else default_value

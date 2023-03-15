@@ -32,21 +32,6 @@ def generate_stock(laplace_params, num_days=252, initial_price=400):
 
 
 
-def buy_hold_strategy(ohlcv, initial_capital, leverage=1):
-    '''
-    Takes a dataframe of OHLCV data and returns a list of trades to be performed.
-
-    Trades in the format:
-    entry_date | entry_price | position | exit_date | exit_price | profit 
-    '''
-
-    trade_list = [(ohlcv['date'][0].date(), 
-                   ohlcv['adjclose'][0], 
-                   initial_capital * leverage // ohlcv['adjclose'][0],
-                   ohlcv['date'].iat[-1].date(),
-                   ohlcv['adjclose'].iat[-1],
-                   (ohlcv['adjclose'].iat[-1] - ohlcv['adjclose'][0]) * initial_capital * leverage // ohlcv['adjclose'][0])]
-    return trade_list
 
 
 
@@ -97,7 +82,7 @@ def get_kpi(rt, ch, stock_daily_change):
     return kpi_dict
 
 
-class test:
+class tester:
     def __init__(self, strats_func):
         '''
         strats_func is a function to that runs several strategies at once
