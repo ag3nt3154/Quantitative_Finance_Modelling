@@ -46,6 +46,7 @@ class tester:
         appends the signals as extra columns in df.
         '''
         self.df = self.strategy.signal_func(data_df, **kwargs)
+
     
 
     def run_strategy(self, initial_capital, **kwargs):
