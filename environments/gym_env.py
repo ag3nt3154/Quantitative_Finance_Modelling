@@ -117,6 +117,9 @@ class TradingEnv(gym.Env):
             print(self.records['actions'])
             plt.plot(np.array(self.records['portfolio_value']) / 1e6 * 400)
             plt.plot(self.price)
+            plt.show()
+            plt.plot(self.records['portfolio_volatility'])
+            plt.show()
             obs = self.__next_observation()
             reward = action[0] * (self.price[self.current_step] - self.price[self.current_step - 1])
             return obs, reward, self.end, {}
@@ -135,7 +138,8 @@ class TradingEnv(gym.Env):
         self.portfolio_value = self.cash + self.position_value
         self.leverage = self.position_value / self.portfolio_value
         self.portfolio_volatility = np.std(
-            self.records['portfolio_value'][-self.lookback_period:]
+            # self.records['portfolio_value'][-self.lookback_period:]
+            self.records['portfolio_value']
             )
 
         self.trader_state = np.array([
