@@ -77,6 +77,7 @@ class TradingEnv(gym.Env):
             'portfolio_value': [],
             'leverage': [],
             'portfolio_volatility': [],
+            'actions': [],
         }
 
         self.trader_state = np.array([
@@ -104,17 +105,24 @@ class TradingEnv(gym.Env):
 
     def step(self, action):
         # define terminate condition
-        if self.current_step >= len(self.input_df):
+        if self.current_step >= len(self.input_df) - 1:
             self.end = True
         if not self.end:
             self.__take_action(action)
             obs = self.__next_observation()
             reward = action[0] * (self.price[self.current_step] - self.price[self.current_step - 1])
+            return obs, reward, self.end, {}
         else:
             # termination
-            self.reset()
+            print(self.records['actions'])
+            plt.plot(np.array(self.records['portfolio_value']) / 1e6 * 400)
+            plt.plot(self.price)
+            obs = self.__next_observation()
+            reward = action[0] * (self.price[self.current_step] - self.price[self.current_step - 1])
+            return obs, reward, self.end, {}
+
         
-        return obs, reward, self.end, {}
+        
         
         
     def __take_action(self, action):
@@ -127,7 +135,7 @@ class TradingEnv(gym.Env):
         self.portfolio_value = self.cash + self.position_value
         self.leverage = self.position_value / self.portfolio_value
         self.portfolio_volatility = np.std(
-            self.records['portfolio_volatility'][-self.lookback_period:]
+            self.records['portfolio_value'][-self.lookback_period:]
             )
 
         self.trader_state = np.array([
@@ -145,11 +153,12 @@ class TradingEnv(gym.Env):
         self.records['portfolio_value'].append(self.portfolio_value)
         self.records['leverage'].append(self.leverage)
         self.records['portfolio_volatility'].append(self.portfolio_volatility)
+        if action[1] != 0:
+            self.records['actions'].append(action)
 
         self.current_step += 1
         
 
     def render(self, mode='human', close=False):
-        print(self.current_step)
-        print(self.portfolio_value)
+        pass
 
