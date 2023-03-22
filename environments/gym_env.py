@@ -66,6 +66,7 @@ class TradingEnv(gym.Env):
         self.portfolio_value = self.cash + self.position_value
         self.leverage = self.position_value / self.portfolio_value
         self.portfolio_volatility = 0
+        self.portfolio_return = 1
         self.end = False
         self.current_step = 0
 
@@ -78,6 +79,7 @@ class TradingEnv(gym.Env):
             'leverage': [],
             'portfolio_volatility': [],
             'actions': [],
+            'portfolio_return': [],
         }
 
         self.trader_state = np.array([
@@ -137,9 +139,10 @@ class TradingEnv(gym.Env):
         self.position_value = self.position * self.price[self.current_step]
         self.portfolio_value = self.cash + self.position_value
         self.leverage = self.position_value / self.portfolio_value
+        self.portfolio_return = self.portfolio_value / self.initial_capital
         self.portfolio_volatility = np.std(
-            # self.records['portfolio_value'][-self.lookback_period:]
-            self.records['portfolio_value']
+            self.records['portfolio_return'][-self.lookback_period:]
+            # self.records['portfolio_return']
             )
 
         self.trader_state = np.array([
@@ -157,6 +160,7 @@ class TradingEnv(gym.Env):
         self.records['portfolio_value'].append(self.portfolio_value)
         self.records['leverage'].append(self.leverage)
         self.records['portfolio_volatility'].append(self.portfolio_volatility)
+        self.records['portfolio_return'].append(self.portfolio_return)
         if action[1] != 0:
             self.records['actions'].append(action)
 
