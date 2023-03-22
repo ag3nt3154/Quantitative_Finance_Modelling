@@ -2,8 +2,10 @@ import gym
 from gym import spaces
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import pandas as pd
 from misc import *
+
 
 class TradingEnv(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -32,6 +34,15 @@ class TradingEnv(gym.Env):
         self.max_price = np.max(self.df['high']) * 2
         self.max_volume = np.max(self.df['volume'])
 
+        self.clean_slate()
+
+        # lookback for time-series data for input
+        self.lookback_period = get_attr(kwargs, 'lookback_period', 20)
+        # lookforward for hindsight bias on the reward
+        self.lookforward_period = get_attr(kwargs, 'lookforward_period', 20)
+
+        self.render_window_size = get_attr(kwargs, 'render_window_size', 20)
+
         # action_space = limit_order = [order_price, order_quantity]
         self.action_space = spaces.Box(
             low=np.array([0, -self.max_volume]),
@@ -40,20 +51,16 @@ class TradingEnv(gym.Env):
         )
 
         self.observation_space = spaces.Box(
-            low=np.array([-1000000 for f in range(len(self.input_feature_list) + 6)]),
-            high=np.array([1000000 for f in range(len(self.input_feature_list) + 6)]),
+            low=np.array([-1000000 for f in range(len(self.input_feature_list) + len(self.trader_state))]),
+            high=np.array([1000000 for f in range(len(self.input_feature_list) + len(self.trader_state))]),
             dtype=np.float64
         )
 
-        self.clean_slate()
-
+        
         # execution mechanism
         self.price = self.df['adjclose'].to_numpy()
 
-        self.lookback_period = get_attr(kwargs, 'lookback_period', 20)
-        self.lookforward_period = get_attr(kwargs, 'lookforward_period', 20)
-
-
+        
     def clean_slate(self):
         '''
         Set initial state of environment.
@@ -78,8 +85,14 @@ class TradingEnv(gym.Env):
             'portfolio_value': [],
             'leverage': [],
             'portfolio_volatility': [],
-            'actions': [],
             'portfolio_return': [],
+        }
+
+        self.trade_record = {
+            'order_quantity': [],
+            'order_price': [],
+            'execution_price': [],
+            'cost_basis': [],
         }
 
         self.trader_state = np.array([
@@ -112,11 +125,10 @@ class TradingEnv(gym.Env):
         if not self.end:
             self.__take_action(action)
             obs = self.__next_observation()
-            reward = action[0] * (self.price[self.current_step] - self.price[self.current_step - 1])
+            reward = action[0] * ((self.price[self.current_step] - self.price[self.current_step - 1]))
             return obs, reward, self.end, {}
         else:
             # termination
-            print(self.records['actions'])
             plt.plot(np.array(self.records['portfolio_value']) / 1e6 * 400)
             plt.plot(self.price)
             plt.show()
@@ -127,15 +139,14 @@ class TradingEnv(gym.Env):
             return obs, reward, self.end, {}
 
         
-        
-        
-        
     def __take_action(self, action):
         # execute order
-        order_price = np.max([action[0], self.price[self.current_step]])
+        order_price = action[0]
+        execution_price = np.max([action[0], self.price[self.current_step]])
         order_quantity = action[1]
-        self.cash -= order_price * order_quantity
-        self.position += order_quantity
+        if order_quantity != 0:
+            self.cash -= execution_price * order_quantity
+            self.position += order_quantity
         self.position_value = self.position * self.price[self.current_step]
         self.portfolio_value = self.cash + self.position_value
         self.leverage = self.position_value / self.portfolio_value
@@ -161,12 +172,13 @@ class TradingEnv(gym.Env):
         self.records['leverage'].append(self.leverage)
         self.records['portfolio_volatility'].append(self.portfolio_volatility)
         self.records['portfolio_return'].append(self.portfolio_return)
-        if action[1] != 0:
-            self.records['actions'].append(action)
+        
+        self.trade_record['order_price'].append(order_price)
+        self.trade_record['order_quantity'].append(order_price)
+        self.trade_record['execution_price'].append(execution_price)
 
         self.current_step += 1
         
 
     def render(self, mode='human', close=False):
         pass
-
