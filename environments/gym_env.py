@@ -16,14 +16,8 @@ class TradingEnv(gym.Env):
         self.initial_capital = get_attr(kwargs, 'initial_capital', 1000000)
         
         self.df = df.copy()
-        self.input_feature_list = get_attr(kwargs, 'input_feature_list', [
-            'open', 
-            'high', 
-            'low', 
-            'close',
-            'adjclose', 
-            'volume'
-        ])
+        self.input_feature_list = input_feature_list
+        assert 'volatility' in input_feature_list
         for f in self.input_feature_list:
             if f not in list(self.df):
                 raise Exception('Input feature ' + f + 'not found in dataframe')
@@ -44,9 +38,9 @@ class TradingEnv(gym.Env):
         self.render_window_size = get_attr(kwargs, 'render_window_size', 20)
 
         # action_space = limit_order = [order_price, order_quantity]
-        self.action_space = spaces.Box(
-            low=np.array([0, -self.max_volume]),
-            high=np.array([self.max_price, self.max_volume]),
+        self.action_space = spaces.Discrete(
+            low=np.array([-5, -5]),
+            high=np.array([5, 5]),
             dtype=np.float64
         )
 
@@ -120,7 +114,7 @@ class TradingEnv(gym.Env):
 
     def step(self, action):
         # define terminate condition
-        if self.current_step >= len(self.input_df) - 1:
+        if self.current_step >= len(self.input_df) - 2:
             self.end = True
         if not self.end:
             self.__take_action(action)
@@ -129,11 +123,11 @@ class TradingEnv(gym.Env):
             return obs, reward, self.end, {}
         else:
             # termination
-            plt.plot(np.array(self.records['portfolio_value']) / 1e6 * 400)
-            plt.plot(self.price)
-            plt.show()
-            plt.plot(self.records['portfolio_volatility'])
-            plt.show()
+            # plt.plot(np.array(self.records['portfolio_value']) / 1e6 * 400)
+            # plt.plot(self.price)
+            # plt.show()
+            # plt.plot(self.records['portfolio_volatility'])
+            # plt.show()
             obs = self.__next_observation()
             reward = action[0] * (self.price[self.current_step] - self.price[self.current_step - 1])
             return obs, reward, self.end, {}
