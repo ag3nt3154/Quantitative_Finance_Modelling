@@ -23,11 +23,6 @@ class TradingEnv(gym.Env):
                 raise Exception('Input feature ' + f + 'not found in dataframe')
         self.input_df = self.df[input_feature_list].to_numpy()
 
-
-        # Set the action space and observation space
-        self.max_price = np.max(self.df['high']) * 2
-        self.max_volume = np.max(self.df['volume'])
-
         self.clean_slate()
 
         # lookback for time-series data for input
@@ -38,10 +33,10 @@ class TradingEnv(gym.Env):
         self.render_window_size = get_attr(kwargs, 'render_window_size', 20)
 
         # action_space = limit_order = [order_price, order_quantity]
-        self.action_space = spaces.Discrete(
-            low=np.array([-5, -5]),
-            high=np.array([5, 5]),
-            dtype=np.float64
+        self.action_space = spaces.Box(
+            low=np.array([-4, -4]),
+            high=np.array([4, 4]),
+            dtype=np.float32
         )
 
         self.observation_space = spaces.Box(
@@ -53,6 +48,7 @@ class TradingEnv(gym.Env):
         
         # execution mechanism
         self.price = self.df['adjclose'].to_numpy()
+        print(self.trader_state)
 
         
     def clean_slate(self):
@@ -109,6 +105,8 @@ class TradingEnv(gym.Env):
         return input arr and trader_state in 1 vector
         '''
         obs = np.concatenate([self.input_df[self.current_step], self.trader_state])
+        self.curr_volatility = self.df['volatility'].to_numpy()[self.current_step]
+        self.curr_price = self.df['close'].to_numpy()[self.current_step]
         return obs
     
 
@@ -134,13 +132,28 @@ class TradingEnv(gym.Env):
 
         
     def __take_action(self, action):
-        # execute order
-        order_price = action[0]
-        execution_price = np.max([action[0], self.price[self.current_step]])
-        order_quantity = action[1]
-        if order_quantity != 0:
+
+        action[0] -= 9 // 2
+        action[1] -= 9 + 9 // 2
+
+        order_price = 0
+        execution_price = 0
+        if action[1] != 0:
+            # execute order
+            order_price = self.curr_price * (1 + (action[0] / 4) * self.curr_volatility)
+            max_long_position = self.portfolio_value // order_price
+            max_short_position = -self.portfolio_value // order_price
+            max_long_order_quantity = max_long_position - self.position
+            max_short_order_quantity = max_short_position - self.position
+            if action[1] > 0:
+                order_quantity = (action[1] / 4) * max_long_order_quantity
+            else:
+                order_quantity = -(action[1] / 4) * max_short_order_quantity
+            
+            execution_price = np.max([self.price[self.current_step + 1], order_price])
             self.cash -= execution_price * order_quantity
             self.position += order_quantity
+        
         self.position_value = self.position * self.price[self.current_step]
         self.portfolio_value = self.cash + self.position_value
         self.leverage = self.position_value / self.portfolio_value
