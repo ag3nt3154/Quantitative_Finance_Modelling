@@ -3,7 +3,7 @@ from datetime import datetime
 import yahoo_fin.stock_info as si
 
 
-def get_price_data(ticker, save=True):
+def get_price_data(ticker, location='datasets/stock_price_series/', save=True):
     # Get historical price data from yahoo_fin
     df = si.get_data(ticker)
     # Change date from index to column
@@ -12,7 +12,7 @@ def get_price_data(ticker, save=True):
     df = df.rename(columns={'index': 'date'})
     if save:
         # Save to csv
-        df.to_csv('stock_price_data/' + ticker + '.csv')
+        df.to_csv(location + ticker + '.csv')
     return(df)
 
 
