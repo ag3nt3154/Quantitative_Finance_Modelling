@@ -3,16 +3,13 @@ from datetime import datetime
 import yahoo_fin.stock_info as si
 
 
-def get_price_data(ticker, location='datasets/stock_price_series/', save=True):
+def get_price_data(ticker):
     # Get historical price data from yahoo_fin
     df = si.get_data(ticker)
     # Change date from index to column
     df.reset_index(inplace=True)
     # Change column name to 'date'
     df = df.rename(columns={'index': 'date'})
-    if save:
-        # Save to csv
-        df.to_csv(location + ticker + '.csv')
     return(df)
 
 
@@ -63,3 +60,14 @@ def get_attr(args, key=None, default_value=None):
         return args[key] if key in args else default_value
     elif isinstance(args, object):
         return getattr(args, key, default_value) if key is not None else default_value
+    
+
+def annualise_returns(total_return, num_days=None, num_trading_days=None):
+    '''
+    Calculate annualised returns from total_return
+    '''
+    assert num_days != None or num_trading_days != None, 'Time period required'
+    if num_days != None:
+        return total_return ** (365.25 / num_days)
+    else:
+        return total_return ** (252 / num_trading_days)
