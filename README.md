@@ -74,5 +74,19 @@ We simulated dynamic delta hedging of vanilla options and noted truncation error
 
 We simulated a hypothetical volatility arbitrage trade, where we purchase an underpriced option (20 implied vol) vs a model volatility (30 vol) and hedge it with shares. We investigate if it is better to hedge to market (implied vol) or to the model.
 
+</br>
 
+## 7. LSTM trading strategy
+
+We use a LSTM model to predict the direction of next day returns and go long or short on a stock based on the prediction. The input features are the OHLCV data, as well as technical indicators such as moving average, RSI, and trailing volatility.
+
+</br>
+
+## 8. Text data trading strategy
+
+We extracted text data from r/wallstreetbets subreddit posts and used it, together with price data, to predict the direction of next day returns of meme-stocks such as GME, TSLA, BBBY, and AAPL. 
+
+The text data were engineered to reflect the sentiment of retail investors by selecting features, such as sentiment score, post length, and number of emojis. We then used lightGBM to create a ML model to predict the next day returns and evaluated the performance of this strategy.
+
+Only a sample of the initial text data is included in this repo due to space constraints.
 
