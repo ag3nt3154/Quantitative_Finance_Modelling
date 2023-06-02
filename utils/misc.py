@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import yahoo_fin.stock_info as si
+import numpy as np
 
 
 def get_price_data(ticker):
@@ -71,3 +72,14 @@ def annualise_returns(total_return, num_days=None, num_trading_days=None):
         return total_return ** (365.25 / num_days)
     else:
         return total_return ** (252 / num_trading_days)
+    
+def generate_stochastic_stock_price(drift, vol, initial_price, num_steps, step_size):
+    '''
+    drift, vol, step_size to be quoted as annualised values
+    e.g. step_size = (1 / 252) for daily stock price
+    '''
+    w = np.random.normal(0, 1, size=num_steps)
+    returns = 1 + drift * step_size + vol * np.sqrt(step_size) * w
+    returns = np.insert(returns, 0, 1)
+    prices = initial_price * np.cumprod(returns)
+    return prices
