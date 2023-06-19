@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime
 import yahoo_fin.stock_info as si
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def get_price_data(ticker):
@@ -63,7 +64,7 @@ def get_attr(args, key=None, default_value=None):
         return getattr(args, key, default_value) if key is not None else default_value
     
 
-def annualise_returns(total_return, num_days=None, num_trading_days=None):
+def get_annualised_returns(total_return, num_days=None, num_trading_days=None):
     '''
     Calculate annualised returns from total_return
     '''
@@ -73,13 +74,40 @@ def annualise_returns(total_return, num_days=None, num_trading_days=None):
     else:
         return total_return ** (252 / num_trading_days)
     
-def generate_stochastic_stock_price(drift, vol, initial_price, num_steps, step_size):
+
+def get_annualised_vol(returns_arr):
     '''
-    drift, vol, step_size to be quoted as annualised values
-    e.g. step_size = (1 / 252) for daily stock price
+    Calculate annualised vol from returns
     '''
-    w = np.random.normal(0, 1, size=num_steps)
-    returns = 1 + drift * step_size + vol * np.sqrt(step_size) * w
-    returns = np.insert(returns, 0, 1)
-    prices = initial_price * np.cumprod(returns)
-    return prices
+    return np.std(returns_arr) * np.sqrt(252)
+
+
+def plot_candle(df, show=False):
+    #define width of candlestick elements
+    width = .4
+    width2 = .05
+
+    #define up and down t.df
+    up = df[df.close>=df.open].copy()
+    down = df[df.close<df.open].copy()
+
+    #define colors to use
+    col1 = 'green'
+    col2 = 'red'
+
+    #plot up t.df
+    plt.bar(up.index,up.close-up.open,width,bottom=up.open,color=col1)
+    plt.bar(up.index,up.high-up.close,width2,bottom=up.close,color=col1)
+    plt.bar(up.index,up.low-up.open,width2,bottom=up.open,color=col1)
+
+    #plot down t.df
+    plt.bar(down.index,down.close-down.open,width,bottom=down.open,color=col2)
+    plt.bar(down.index,down.high-down.open,width2,bottom=down.open,color=col2)
+    plt.bar(down.index,down.low-down.close,width2,bottom=down.close,color=col2)
+
+    #rotate x-axis tick labels
+    plt.xticks(rotation=45, ha='right')
+
+    if show:
+        #display candlestick chart
+        plt.show()
