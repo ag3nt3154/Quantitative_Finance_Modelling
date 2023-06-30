@@ -14,8 +14,6 @@ class backTester:
         
         self.clean_slate()
 
-        
-
 
     def clean_slate(self):
         '''
@@ -54,6 +52,10 @@ class backTester:
 
 
     def set_asset(self, df):
+        '''
+        Set the asset df to the backtester
+        Change df columns to numpy arrays for faster computation
+        '''
         self.df = df
 
         self.open = self.df['open'].to_numpy()
@@ -66,11 +68,12 @@ class backTester:
 
 
     def take_action(self, order_quantity=0, order_price=0):
+        '''
+        Execute order 
+        '''
         execution_price = 0
         execution_quantity = 0
         
-        
-
         if order_quantity == 0:
             pass
         else:
@@ -107,7 +110,9 @@ class backTester:
         self.current_step += 1
 
         if self.current_step == len(self.df):
-            print('end')
+            # print('end')
+            pass
+
 
 
     def analyse(self):
@@ -115,14 +120,13 @@ class backTester:
         self.records['date'] = self.date
         self.records = self.records.set_index('date')
         self.records['returns'] = self.records['portfolio_value'].pct_change()
-        self.records['cum_returns'] = (self.records['portfolio_value'] 
-                                              / self.records['portfolio_value'][0])
-        self.records['drawdown'] = (self.records['cum_returns'] - self.records['cum_returns'].cummax())/self.records['cum_returns'].cummax()
+        self.records['cum_returns'] = (self.records['portfolio_value'] / self.records['portfolio_value'][0])
+        self.records['drawdown'] = (self.records['cum_returns'] - self.records['cum_returns'].cummax()) / self.records['cum_returns'].cummax()
         self.records['buy_hold_returns'] = self.df['adjclose'].pct_change()
         self.records['buy_hold_cum_returns'] = self.adjclose / self.adjclose[0]
-        self.records['buy_hold_drawdown'] = (self.records['buy_hold_cum_returns'] - self.records['buy_hold_cum_returns'].cummax())/self.records['buy_hold_cum_returns'].cummax()
+        self.records['buy_hold_drawdown'] = (self.records['buy_hold_cum_returns'] - self.records['buy_hold_cum_returns'].cummax()) / self.records['buy_hold_cum_returns'].cummax()
         
-        self.time_period = (self.date[-1] - self.date[0]).days
+        self.time_period = len(self.df)
         self.annual_return = misc.get_annualised_returns(self.records['cum_returns'][-1], self.time_period) - 1
         self.annual_vol = misc.get_annualised_vol(self.records['returns'])
         

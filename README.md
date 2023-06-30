@@ -90,3 +90,23 @@ The text data were engineered to reflect the sentiment of retail investors by se
 
 Only a sample of the initial text data is included in this repo due to space constraints.
 
+</br>
+
+## 9. Forecasting Volatility
+
+We used standard models such as ARIMA, GARCH, EWMA to forecast volatility of a randomly generated price series.
+
+</br>
+
+## 10. Forecasting SPX returns with Macro Data
+
+We use macro-economic data, such as inflation rate, interest rate, unemployment rate, etc to forecast SPX returns. We explore several models in this notebook:
+1. We use a supply/demand model for different asset classes (bond, cash, equities) to predict the 10-yr SPX returns.
+2. We explore using unemployment rate as a recession indicator.
+3. We use a machine learning model to predict SPX returns.
+
+</br>
+
+## 11. Turtle Trading
+
+We use a simple backtesting framework to investigate the efficacy of trading rules used in the turtle trading experiment. We then analyse the characteristics of this strategy.

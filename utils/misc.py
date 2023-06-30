@@ -39,7 +39,10 @@ def clean_df(dataframe):
     '''
     dataframe = del_unnamed_col(dataframe)
     dataframe.reset_index(drop=True)
-    dataframe['date'] = dataframe.apply(lambda x: str2date(x['date']), axis=1)
+    try:
+        dataframe['date'] = dataframe.apply(lambda x: str2date(x['date']), axis=1)
+    except KeyError:
+        dataframe['DATE'] = dataframe.apply(lambda x: str2date(x['DATE']), axis=1)
     return dataframe
 
 
@@ -83,6 +86,11 @@ def get_annualised_vol(returns_arr):
 
 
 def plot_candle(df, show=False):
+    '''
+    Plot candle-stick chart from dataframe.
+    df must contain OHLC time series as ['open', 'high', 'low', 'close']
+    show -> immediately show chart -> set as false if we are plotting something else
+    '''
     #define width of candlestick elements
     width = .4
     width2 = .05
@@ -111,3 +119,10 @@ def plot_candle(df, show=False):
     if show:
         #display candlestick chart
         plt.show()
+
+
+def get_total_return(arr):
+    '''
+    Given price series, get total return
+    '''
+    return arr[-1]/arr[0] - 1
