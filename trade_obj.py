@@ -156,9 +156,15 @@ class tradeList:
             
             plot_candle(t.df)
             
-            plt.plot(t.df['stop_loss'], color='C1', label='stop loss')
-            plt.scatter(t.df.index, t.df['entry_price'], marker='^', color='black', label='entry')
-            plt.scatter(t.df.index, t.df['exit_price'], marker='v', color='black', label='exit')
+            try:
+                plt.plot(t.df['stop_loss'], color='C1', label='stop loss')
+            except KeyError:
+                pass
+            try:
+                plt.scatter(t.df.index, t.df['entry_price'], marker='^', color='black', label='entry')
+                plt.scatter(t.df.index, t.df['exit_price'], marker='v', color='black', label='exit')
+            except KeyError:
+                pass
             plt.legend()
             plt.show()
     
@@ -170,9 +176,12 @@ class tradeList:
         plt.figure(figsize=(15,10)) 
         plot_candle(df1)
 
-        plt.plot(df1['stop_loss'], color='C1', label='stop loss')
-        plt.scatter(df1.index, df1['entry_price'], marker='^', color='black', label='entry')
-        plt.scatter(df1.index, df1['exit_price'], marker='v', color='black', label='exit')
+        try:
+            plt.plot(df1['stop_loss'], color='C1', label='stop loss')
+            plt.scatter(df1.index, df1['entry_price'], marker='^', color='black', label='entry')
+            plt.scatter(df1.index, df1['exit_price'], marker='v', color='black', label='exit')
+        except KeyError:
+            pass
         plt.legend()
         plt.show()
 
