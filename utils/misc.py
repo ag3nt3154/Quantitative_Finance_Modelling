@@ -126,3 +126,26 @@ def get_total_return(arr):
     Given price series, get total return
     '''
     return arr[-1]/arr[0] - 1
+
+
+def generate_price_series_norm(mean, volatility, initial_price, num_days, leverage=None):
+    returns = np.random.normal(mean, volatility, num_days)
+    prices = [initial_price]
+    price_series = None
+    lev_price_series = None
+    
+    for i in range(1, num_days):
+        price = prices[i-1] * (1 + returns[i])
+        prices.append(price)
+    price_series = np.array(prices)
+
+    if leverage is not None:
+        prices = [initial_price]
+        for i in range(1, num_days):
+            price = prices[i-1] * (1 + leverage * returns[i])
+            prices.append(price)
+        lev_price_series = prices
+
+
+    return price_series, lev_price_series
+    

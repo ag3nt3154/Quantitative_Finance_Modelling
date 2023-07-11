@@ -120,17 +120,17 @@ class backTester:
         self.records['date'] = self.date
         self.records = self.records.set_index('date')
         self.records['returns'] = self.records['portfolio_value'].pct_change()
-        self.records['cum_returns'] = (self.records['portfolio_value'] / self.records['portfolio_value'][0])
+        self.records['cum_returns'] = (self.records['portfolio_value'] / self.records['portfolio_value'].to_numpy()[0])
         self.records['drawdown'] = (self.records['cum_returns'] - self.records['cum_returns'].cummax()) / self.records['cum_returns'].cummax()
         self.records['buy_hold_returns'] = self.df['adjclose'].pct_change()
         self.records['buy_hold_cum_returns'] = self.adjclose / self.adjclose[0]
         self.records['buy_hold_drawdown'] = (self.records['buy_hold_cum_returns'] - self.records['buy_hold_cum_returns'].cummax()) / self.records['buy_hold_cum_returns'].cummax()
         
         self.time_period = len(self.df)
-        self.annual_return = misc.get_annualised_returns(self.records['cum_returns'][-1], self.time_period) - 1
+        self.annual_return = misc.get_annualised_returns(self.records['cum_returns'].to_numpy()[-1], self.time_period) - 1
         self.annual_vol = misc.get_annualised_vol(self.records['returns'])
         
-        self.buy_hold_annual_return = misc.get_annualised_returns(self.records['buy_hold_cum_returns'][-1], self.time_period) - 1
+        self.buy_hold_annual_return = misc.get_annualised_returns(self.records['buy_hold_cum_returns'].to_numpy()[-1], self.time_period) - 1
         self.buy_hold_annual_vol = misc.get_annualised_vol(self.records['buy_hold_returns'])
 
         self.sharpe = self.annual_return / self.annual_vol
@@ -143,11 +143,13 @@ class backTester:
         fig, axs = plt.subplots(4, 2, figsize=(16, 14))
         axs[0, 0].plot(self.records['cum_returns'], label='strategy')
         axs[0, 0].set_title('Cumulative returns')
+        axs[0, 0].set_yscale('log')
         axs[0, 0].legend()
 
         axs[0, 1].plot(self.records['buy_hold_cum_returns'], label='buy_hold', color='C1')
         axs[0, 1].plot(self.records['cum_returns'], label='strategy')
         axs[0, 1].set_title('Cumulative returns')
+        axs[0, 1].set_yscale('log')
         axs[0, 1].legend()
 
         axs[1, 0].hist(self.records['returns'], bins=50, label='strategy')
