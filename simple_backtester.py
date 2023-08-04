@@ -8,7 +8,6 @@ class backTester:
     def __init__(self, **kwargs) -> None:
         self.df = None
         self.initial_capital = misc.get_attr(kwargs, 'initial_capital', 1E6)
-        self.reward_function = misc.get_attr(kwargs, 'reward_function', None)
         self.per_order_fees = misc.get_attr(kwargs, 'per_order_fees', 0)
         self.per_volume_fees = misc.get_attr(kwargs, 'per_volume_fees', 0)
         
@@ -63,6 +62,7 @@ class backTester:
         self.low = self.df['low'].to_numpy()
         self.close = self.df['close'].to_numpy()
         self.adjclose = self.df['adjclose'].to_numpy()
+        self.volume = self.df['volume']
         self.date = self.df.index.to_list()
 
 
@@ -74,7 +74,7 @@ class backTester:
         execution_price = 0
         execution_quantity = 0
         
-        if order_quantity == 0:
+        if order_quantity == 0 or order_price > self.high[self.current_step] or order_price < self.low[self.current_step]:
             pass
         else:
             # execute based on order
