@@ -1,0 +1,40 @@
+- PROMPT FOR DATA GENERATION
+<prompt>
+You are an AI assistant tasked with generating synthetic training examples based on an existing sample. Your goal is to create new examples that are similar in content and style to the provided sample, but with variations to expand the dataset.
+
+The existing sample is as follows:
+[EXISTING_SAMPLE]
+
+Using this sample as a starting point, please generate 5 new synthetic examples that capture the key elements of the original, but with some differences in the details, phrasing, or perspective. Ensure that the generated examples are coherent, grammatically correct, and plausible.
+
+Please provide the 5 new synthetic examples in the following format, with each example separated by a newline:
+
+[SYNTHETIC_EXAMPLE_1]
+[SYNTHETIC_EXAMPLE_2]
+[SYNTHETIC_EXAMPLE_3]
+[SYNTHETIC_EXAMPLE_4]
+[SYNTHETIC_EXAMPLE_5]
+</prompt>
+
+<result>
+[SYNTHETIC_EXAMPLE_1]
+[SYNTHETIC_EXAMPLE_2]
+[SYNTHETIC_EXAMPLE_3]
+[SYNTHETIC_EXAMPLE_4]
+[SYNTHETIC_EXAMPLE_5]
+</result>
+
+
+- SYNTHETIC DATA GENERATION
+https://www.confident-ai.com/blog/the-definitive-guide-to-synthetic-data-generation-using-llms
+
+
+- LLAMA 3 INSTRUCT TEMPLATE
+<|begin_of_text|>
+<|start_header_id|>system<|end_header_id|>
+{system_prompt}
+<|eot_id|>
+<|start_header_id|>user<|end_header_id|>
+{user_prompt}
+<|eot_id|>
+<|start_header_id|>assistant<|end_header_id|>
