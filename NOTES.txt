@@ -1,0 +1,30 @@
+Beta factor investing
+
+Equity risk premium 
+- SPY3 / UPRO:  30% 
+- SPY:          70%
+
+Trend premium
+- UPRO
+- TMF
+- GLD
+- USO
+- IBIT
+- DBA
+
+Commodity risk premium
+- DBA
+- DBB
+- GLD
+- USO
+- IBIT
+- URA
+
+Term premium + credit premium
+- LQD
+- TLT
+- TMF
+
+Riskfree
+- IB01
+- S&P U.S. Treasury Bond 0-1 Year (^SPBDUS1T)
